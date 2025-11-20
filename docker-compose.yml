@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  ingesta:
+    build:
+      context: ./ingesta
+      dockerfile: Dockerfile
+    container_name: seguridad-ingesta
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config:/app/config:ro
+      - ./utils:/app/utils:ro
+    environment:
+      - INFERENCE_URL=http://inferencia:8001/infer
+      - LOG_LEVEL=INFO
+    networks:
+      - seguridad-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  inferencia:
+    build:
+      context: ./inferencia
+      dockerfile: Dockerfile
+    container_name: seguridad-inferencia
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./config:/app/config:ro
+      - ./utils:/app/utils:ro
+      - ./inferencia/models:/app/models
+    environment:
+      - FUSION_URL=http://fusion:8002/alert
+      - LOG_LEVEL=INFO
+    networks:
+      - seguridad-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  fusion:
+    build:
+      context: ./fusion
+      dockerfile: Dockerfile
+    container_name: seguridad-fusion
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./config:/app/config:ro
+      - ./utils:/app/utils:ro
+      - ./fusion/logs:/app/logs
+    environment:
+      - LOG_LEVEL=INFO
+    env_file:
+      - ./config/telegram.env
+    networks:
+      - seguridad-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: seguridad-web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./fusion/logs:/app/logs:ro
+    networks:
+      - seguridad-network
+    restart: unless-stopped
+    depends_on:
+      - fusion
+
+networks:
+  seguridad-network:
+    driver: bridge
+

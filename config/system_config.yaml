@@ -1,0 +1,24 @@
+# Configuración del Sistema de Vigilancia IA
+
+esp32:
+  stream_url: "http://192.168.1.100:81/stream"
+  reconnect_interval: 5  # segundos
+
+services:
+  inference_url: "http://inferencia:8001/infer"
+  fusion_url: "http://fusion:8002/alert"
+
+ingesta:
+  fps: 1  # Frames por segundo a procesar
+  buffer_size: 1
+  timeout: 10  # segundos
+
+fusion:
+  alert_threshold: 0.5  # Confianza mínima para alerta
+  enabled_classes: []  # Lista vacía = todas las clases, ej: ["person", "car"]
+  time_window: 60  # Segundos entre alertas del mismo tipo
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file_rotation: true
+

@@ -1,0 +1,46 @@
+{
+  "role": "Senior System Architect",
+  "task": "Generate Full Stack Surveillance System Repo",
+  "output_format": {
+    "style": "Production Ready Code",
+    "file_marker": "===== FILE: {path} =====",
+    "constraint": "NO pseudocode. fully_functional. single_response"
+  },
+  "stack": ["Python 3.9", "FastAPI", "YOLOv8(n)", "Docker Compose", "OpenCV-headless", "TelegramBot"],
+  "system_flow": "ESP32(MJPEG) -> Ingest -> Base64 -> Inference(YOLO) -> Fusion(Rules) -> Telegram/Web",
+  "project_tree": "seguridad-ia-esp32",
+  "files": {
+    "root": {
+      "README.md": "Docs: Arch, Install, Train, Connect ESP32, Extend",
+      "docker-compose.yml": "Services: ingesta(8000), inferencia(8001), fusion(8002), web(8080). Network: internal",
+      "requirements.txt": "fastapi, uvicorn, opencv-python-headless, ultralytics, python-telegram-bot, aiohttp, requests, jinja2"
+    },
+    "ingesta": {
+      "server.py": "FastAPI. Stream MJPEG from ESP32. Extract frames. Async POST frame(base64) to /infer",
+      "Dockerfile": "Python slim. Expose 8000"
+    },
+    "inferencia": {
+      "service.py": "FastAPI. Load YOLOv8n. Endpoint /infer: decode b64 -> predict -> POST /alert (if det)",
+      "yolov8_config.yaml": "Model settings",
+      "Dockerfile": "Python + GL libs"
+    },
+    "fusion": {
+      "alert_service.py": "FastAPI. Endpoint /alert. Logic: if conf > threshold -> Send Telegram & Log",
+      "rules.py": "Detection logic classes",
+      "Dockerfile": "Python slim"
+    },
+    "web": {
+      "index.html": "Dashboard. Fetch & display alert logs",
+      "app.js": "Fetch logic",
+      "Dockerfile": "Nginx or Python simple http"
+    },
+    "utils": {
+      "logger.py": "Unified logging config",
+      "helpers.py": "Base64/Image utils"
+    },
+    "config": {
+      "telegram.env": "BOT_TOKEN, CHAT_ID",
+      "system_config.yaml": "Thresholds, URLs"
+    }
+  }
+}
