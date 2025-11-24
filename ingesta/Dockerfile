@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código
 COPY server.py .
-COPY ../utils /app/utils
-COPY ../config /app/config
+# `utils` y `config` se montan en tiempo de ejecución desde `docker-compose.yml`
+# (evitamos copiar fuera del contexto de build para que `docker compose` funcione).
 
 EXPOSE 8000
 
