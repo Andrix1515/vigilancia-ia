@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Instalar dependencias del sistema para OpenCV y GL
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -22,8 +22,8 @@ RUN mkdir -p /app/models
 
 # Copiar código
 COPY service.py .
-COPY ../utils /app/utils
-COPY ../config /app/config
+# `utils` y `config` se montan en tiempo de ejecución desde `docker-compose.yml`
+# (evitamos copiar fuera del contexto de build para que `docker compose` funcione).
 
 EXPOSE 8001
 

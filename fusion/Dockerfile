@@ -17,8 +17,8 @@ RUN mkdir -p /app/logs
 # Copiar código
 COPY alert_service.py .
 COPY rules.py .
-COPY ../utils /app/utils
-COPY ../config /app/config
+# `utils` y `config` se montan en tiempo de ejecución desde `docker-compose.yml`
+# (evitamos copiar fuera del contexto de build para que `docker compose` funcione).
 
 EXPOSE 8002
 
